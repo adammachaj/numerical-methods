@@ -35,7 +35,7 @@ double newton(function f, function p, double x)
 		x0 = x1;
 
 		cout << "Iteracja i =" << i;
-		cout << ", x1 = " << x1 << ", est = " << estymator << ", reziduum =" << f(x0) << endl;
+		cout << ", x1 = " << x1 << ", est = " << estymator << ", reziduum =" << f(x0) << " , f(x1) = " << f(x1) << endl;
 //		warunki zakonczenia iteracji
 		if (fabs(f(x0)) <= TOLF || estymator <= TOLX) break;
 	}
@@ -46,7 +46,7 @@ double picard(function f, function p, function pic, function picP, double x)
 {	
 	if ( fabs( f(x) ) >= 1 )
 	{
-		cout << "FI'(x) >= 1. Oznacza to rozbie¿noœæ - metoda Picarda nie przybli¿y pierwiastka";
+		cout << "FI'(x) >= 1. Oznacza to rozbieÅ¼noÅ›Ä‡ - metoda Picarda nie przybliÅ¼y pierwiastka";
 		return 0;
 	}
 	
@@ -60,7 +60,7 @@ double picard(function f, function p, function pic, function picP, double x)
 	{
 		cout << "Nr iteracji: " << i;
 		nx = pic(nx);
-		cout << ", Przybli¿enie = " << nx;
+		cout << ", PrzybliÅ¼enie = " << nx;
 
 		//zmiana estymatora
 		est = fabs(nx - x);
@@ -142,5 +142,8 @@ double sieczne(function f, double x0, double x1)
 
 int main()
 {
-	sieczne(funA, -100, 100);
+	//newton(funA, pochA, 700);
+	//picard(funA, pochA, funA_pic, pochA_pic, 20.0);
+	//bisekcja(funA, -100.0, 1000.0);
+	//sieczne(funA, 10.0, 100.0);
 }
