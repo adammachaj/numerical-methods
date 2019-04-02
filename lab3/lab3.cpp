@@ -2,24 +2,24 @@
 #include <cmath>
 
 #define NMAX 100
-#define TOLF 1e-8
-#define TOLX 1e-8
+#define TOLF 1e-8 //reziduum
+#define TOLX 1e-8 //estymator
 using namespace std;
 
 typedef double (*function)(double);
 
 //funkcje pierwotne
 double funA(double x){return ( sin(x / 4.0) * sin(x / 4.0) - x );}
-double pochA(double x){return ( (cos(x / 4.0) * sin(x / 4.0) / 2.0) - 1 );}
+double pochA(double x){return ( (cos(x / 4.0) * sin(x / 4.0) / 2.0) - 1.0 );}
 //pochodne funkcji
 double funB(double x){return ( tan(2.0 * x) - x - 1.0 );}
 double pochB(double x){return ( 1 / ((cos(2.0 * x)) * (cos(2.0 * x))) * 2.0 - 1.0 );}
 //funkcja psi
-double funA_pic(double x){return x;}
-double funB_pic(double x){return x;}
+double funA_pic(double x){return ( sin(x / 4.0) * sin(x / 4.0) );}
+double funB_pic(double x){return ( tan(2.0 * x) - 1.0 );}
 //pochodna funkcji psi
-double pochA_pic(double x){return x;}
-double pochB_pic(double x){return x;}
+double pochA_pic(double x){return ( cos(x / 4.0) * sin(x / 4.0) / 2.0 );}
+double pochB_pic(double x){return ( 2 / (cos(x) * cos(x)) );}
 
 
 //metoda newtona
@@ -44,9 +44,9 @@ double newton(function f, function p, double x)
 //metoda picarda
 double picard(function f, function p, function pic, function picP, double x)
 {	
-	if ( fabs( f(x) ) >= 1 )
+	if ( fabs( picP(x) ) >= 1 )
 	{
-		cout << "FI'(x) >= 1. Oznacza to rozbieżność - metoda Picarda nie przybliży pierwiastka";
+		cout << "FI'(x) >= 1. Oznacza to rozbieznosc - metoda Picarda nie przyblizy pierwiastka";
 		return 0;
 	}
 	
@@ -92,7 +92,7 @@ double bisekcja(function f, double a, double b)
 			cout << "Wartosc f(x) na poczatku przedzialu: " << f(a) << " , na koncu: " << f(b) << endl;
 			xn = (a + b) / 2.0;
 			est = (b - a) / 2.0;
-			cout << "a = " << a << "\tb = " << b << "\tSrodek przedzialu = " << xn << "\tReziduum = " << f(xn);
+			cout << "a = " << a << "\tb = " << b << "\t\tSrodek przedzialu = " << xn << "\tReziduum = " << f(xn);
 			
 			if ( (f(a) < 0 && f(xn) > 0) || (f(xn) < 0 && f(a) > 0))
 			{
@@ -114,7 +114,6 @@ double bisekcja(function f, double a, double b)
 	if ((fabs(f(xn)) <= TOLF) or (fabs((b - a) / 2) <= TOLX)) 
 		break;
 	}
-	if (!f(xn)) cout << "x0= " << xn << "(" << f(xn) << ")" << endl;
 }
 
 double sieczne(function f, double x0, double x1)
@@ -144,6 +143,6 @@ int main()
 {
 	//newton(funA, pochA, 700);
 	//picard(funA, pochA, funA_pic, pochA_pic, 20.0);
-	//bisekcja(funA, -100.0, 1000.0);
-	//sieczne(funA, 10.0, 100.0);
+	//bisekcja(funA, -200.0, 100);
+	sieczne(funA, 10.0, 100.0);
 }
