@@ -15,28 +15,29 @@ void showMatrix(double matrix[6][6])
 	}
 }
 
-void thompsonStepOne(double matrix[6][6])
+void thompsonStepOne(double matrixA[6][6])
 {
-    for(int i = 1; i<6;i++){
-        matrixA[i][i] = matrixA[i][i] - matrixA[i][i-1] * (1.0 / matrixA[i - 1][i - 1] * matrixA[i-1][i];	
+    for(int i = 1; i<6;i++)
+	{
+        matrixA[i][i] = matrixA[i][i] - matrixA[i][i-1] * (1.0 / matrixA[i - 1][i - 1] * matrixA[i-1][i]);	
 	}	
 }
 
-void thompsonStepTwo(double matrix[6][6], double vector[6])
+void thompsonStepTwo(double matrixA[6][6], double vectorB[6])
 {
 	for(int i = 1; i<6; i++){
         vectorB[i] = vectorB[i] - matrixA[i][i - 1] * (1.0 / matrixA[i - 1][i - 1]) * vectorB[i - 1];
     }
 }
 
-void thompsonStepThree(double matrix[6][6], double vector[6])
+void thompsonStepThree(double matrixA[6][6], double vectorB[6])
 {
 	double x [6];
   	x[5] = (1.0 / matrixA[5][5]) * vectorB[5];
   	
   	for(int i = 4; i >= 0; i--)
 	{
-    	x[i] = (1.0/matrixA[i][i]*(vectorB[i] - matrixA[i][i] * x[i + 1]);
+    	x[i] = (1.0/matrixA[i][i]*(vectorB[i] - matrixA[i][i] * x[i + 1]));
    	}
    	
    	cout<<"ROZWIAZANIE:\n";
@@ -67,6 +68,6 @@ int main()
 	vectorB[5] = -319.0/10.0;
 	
 	thompsonStepOne(matrixA);
-    thompsonStepTwo(vectorB, matrixA);
+    thompsonStepTwo(matrixA, vectorB);
     thompsonStepThree(matrixA, vectorB);
 }	
