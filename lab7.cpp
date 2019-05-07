@@ -1,5 +1,3 @@
--std=c++11
-
 #include <iostream>
 #include <string>
 #include <cmath>
@@ -48,13 +46,13 @@ double maxVector(array<double, 4> vector)
 	return max;
 }
 
-bool estymator(array<double, 4> Xs, array<double, 4> Xn)
+bool estymator(array<double, 4> Xo, array<double, 4> Xn)
 {
 	array<double, 4> h;
 	
 	for(int i = 0; i < N; i++)
 	{
-		h[i] = fabs(Xs[i] - Xn[i]);
+		h[i] = fabs(Xo[i] - Xn[i]);
 	}
 	cout<<"Estymator bledu: \t";
 	
@@ -89,7 +87,7 @@ bool residuum(array<double, 4> Xn)
 
 void jacobi(array<array<double, 4>, 4> L, array<array<double, 4>, 4> D, array<array<double, 4>, 4> U, array<double, 4> vector, array<double, 4> X)
 {
-	array<double, 4> c, Xn, Xs;
+	array<double, 4> c, Xn, Xo;
 	double mx;
 	array<array<double, 4>, 4> m;
 	
@@ -118,7 +116,7 @@ void jacobi(array<array<double, 4>, 4> L, array<array<double, 4>, 4> D, array<ar
 	for(int i = 0; i < 100; i++)
 	{
 		cout<<"Iteracja : "<<i<<endl;
-		for(int p=0; p<N; p++){Xs[p] = Xn[p];}
+		for(int p=0; p<N; p++){Xo[p] = Xn[p];}
 		for(int j=0; j<N; j++)
 		{
 			mx = 0;
@@ -126,13 +124,13 @@ void jacobi(array<array<double, 4>, 4> L, array<array<double, 4>, 4> D, array<ar
 			{
 				if(k != j)
 				{
-					mx +=m[j][k] * Xs[k];
+					mx +=m[j][k] * Xo[k];
 				}
 			}
 			Xn[j] = c[j] - mx;
 			
 		}
-		if(estymator(Xs, Xn) || residuum(Xn))
+		if(estymator(Xo, Xn) || residuum(Xn))
 		{
 			break;
 		}
@@ -143,7 +141,7 @@ void jacobi(array<array<double, 4>, 4> L, array<array<double, 4>, 4> D, array<ar
 }
 void gauss(array<array<double, 4>, 4> tab, array<double, 4> vector, array<double, 4> X)
 {
-	array<double, 4> Xn, Xs;
+	array<double, 4> Xn, Xo;
 	for(int i=0; i<N; i++)
 	{
 		Xn[i] = X[i];
@@ -151,7 +149,7 @@ void gauss(array<array<double, 4>, 4> tab, array<double, 4> vector, array<double
 	for(int i=0; i<100; i++)
 	{
 		cout<<"Iteracja : "<<i<<endl;
-		for(int p=0; p<N; p++){Xs[p] = Xn[p];}
+		for(int p=0; p<N; p++){Xo[p] = Xn[p];}
 		for(int j=0; j<N; j++)
 		{
 			double p[2];
@@ -166,13 +164,13 @@ void gauss(array<array<double, 4>, 4> tab, array<double, 4> vector, array<double
 						p[0] += tab[j][k] * Xn[k];
 					}
 					else{
-						p[1] += tab[j][k] * Xs[k];
+						p[1] += tab[j][k] * Xo[k];
 					}
 				}
 			}
 			Xn[j] = (vector[j] - p[0] - p[1]) / tab[j][j];
 		}
-		if(estymator(Xs, Xn) || residuum(Xn))
+		if(estymator(Xo, Xn) || residuum(Xn))
 		{
 			break;
 		}
@@ -180,7 +178,7 @@ void gauss(array<array<double, 4>, 4> tab, array<double, 4> vector, array<double
 }
 void sor(array<array<double, 4>, 4> tab, array<double, 4> vector, array<double, 4> X)
 {
-	array<double, 4> Xn, Xs;
+	array<double, 4> Xn, Xo;
 	for(int i=0; i<N; i++)
 	{
 		Xn[i] = X[i];
@@ -188,7 +186,7 @@ void sor(array<array<double, 4>, 4> tab, array<double, 4> vector, array<double, 
 	for(int i=0; i<100; i++)
 	{
 		cout<<"Iteracja : "<<i<<endl;
-		for(int p=0; p<N; p++){Xs[p] = Xn[p];}
+		for(int p=0; p<N; p++){Xo[p] = Xn[p];}
 		for(int j=0; j<N; j++)
 		{
 			double p[2];
@@ -202,13 +200,13 @@ void sor(array<array<double, 4>, 4> tab, array<double, 4> vector, array<double, 
 						p[0] += tab[j][k] * Xn[k];
 					}
 					else{
-						p[1] += tab[j][k] * Xs[k];
+						p[1] += tab[j][k] * Xo[k];
 					}
 				}
 			}
-			Xn[j] = (1 - O) * Xs[j] - O*(p[0] + p[1] - vector[j]) / tab[j][j];
+			Xn[j] = (1 - O) * Xo[j] - O*(p[0] + p[1] - vector[j]) / tab[j][j];
 		}
-		if(estymator(Xs, Xn) || residuum(Xn))
+		if(estymator(Xo, Xn) || residuum(Xn))
 		{
 			break;
 		}
@@ -227,10 +225,10 @@ int main()
     array<double, 4> vec;
     vec[0] = 395.0; vec[1] = 603.0; vec[2] = -415.0; vec[3] = -606.0;
     
-    array<double, 4> Xs; 
+    array<double, 4> Xo; 
 	for(int i = 0; i < 4; i++)
 	{
-		Xs[i] = 1;
+		Xo[i] = 1;
 	}
 	
 	array<array<double, 4>, 4> L, D, U;
@@ -259,11 +257,11 @@ int main()
 	  }
 	  
       cout << "JACOBI" << endl;
-      jacobi(L, D, U, vec, Xs);
+      jacobi(L, D, U, vec, Xo);
       cout << endl << "Gauss" << endl;
-      gauss(arr, vec, Xs);
+      gauss(arr, vec, Xo);
       cout << endl << "Sor" << endl;
-      sor(arr, vec, Xs);
+      sor(arr, vec, Xo);
 	  
       return 0;
   }
