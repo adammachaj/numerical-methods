@@ -29,7 +29,7 @@ void showVector(array<double, 4> vector)
 {
 	for(int i = 0; i < 4; i++)
 	{
-		cout << vector[i] <<" ";
+		cout << vector[i] <<"\t";
 	}
 	cout<<endl;
 }
@@ -56,7 +56,7 @@ bool estymator(array<double, 4> Xs, array<double, 4> Xn)
 	{
 		h[i] = fabs(Xs[i] - Xn[i]);
 	}
-	cout<<"Estymator bledu: ";
+	cout<<"Estymator bledu: \t";
 	
 	showVector(h);
 	
@@ -76,7 +76,7 @@ bool residuum(array<double, 4> Xn)
 	h[1] = fabs(4*Xn[0] + 300*Xn[1] - 5*Xn[2] + 6 * Xn[3] - 603);
 	h[2] = fabs(7*Xn[0] - 8*Xn[1] - 400*Xn[2] + 9*Xn[3] - 385);
 	h[3] = fabs(-10*Xn[0] + 11*Xn[1] - 12*Xn[2] + 200 * Xn[3] + 606);
-	cout<<"Estymator residuum: ";
+	cout<<"Estymator residuum: \t";
 	showVector(h);
 	if(maxVector(h) < R)
 	{
@@ -117,7 +117,7 @@ void jacobi(array<array<double, 4>, 4> L, array<array<double, 4>, 4> D, array<ar
 	}
 	for(int i = 0; i < 100; i++)
 	{
-		cout<<"Iteracja nr: "<<i<<endl;
+		cout<<"Iteracja : "<<i<<endl;
 		for(int p=0; p<N; p++){Xs[p] = Xn[p];}
 		for(int j=0; j<N; j++)
 		{
@@ -150,7 +150,7 @@ void gauss(array<array<double, 4>, 4> tab, array<double, 4> vector, array<double
 	}
 	for(int i=0; i<100; i++)
 	{
-		cout<<"Iteracja nr: "<<i<<endl;
+		cout<<"Iteracja : "<<i<<endl;
 		for(int p=0; p<N; p++){Xs[p] = Xn[p];}
 		for(int j=0; j<N; j++)
 		{
@@ -187,7 +187,7 @@ void sor(array<array<double, 4>, 4> tab, array<double, 4> vector, array<double, 
 	}
 	for(int i=0; i<100; i++)
 	{
-		cout<<"Iteracja nr: "<<i<<endl;
+		cout<<"Iteracja : "<<i<<endl;
 		for(int p=0; p<N; p++){Xs[p] = Xn[p];}
 		for(int j=0; j<N; j++)
 		{
