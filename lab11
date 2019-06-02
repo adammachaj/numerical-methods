@@ -1,0 +1,305 @@
+#include <iostream>
+#include <cmath>
+#define M_PI		3.14159265358979323846
+#include <vector>
+#include <fstream>
+#include <algorithm>
+
+using namespace std;
+
+double warPocz = 0.0;
+double warBrz1 = 0.0;
+double warBrz2 = 0.0;
+double tmax = 0.5;
+double tmin = 0.0;
+const double D = 1.0;
+double x0 = 0.0;
+double xn = 1.0;
+double h = 0.05;
+double Dt = h*h*0.4;
+
+void zapisDoPliku(vector<vector<double>> matrix, int m, int n, double Dt, double h, string nazwa)
+{
+	ofstream File;
+	File.open(nazwa);
+	
+	for(int i = 0; i < m; i++)
+	{
+		File << h * i;
+		File << " ";
+		
+		for(int j = 0; j < n; j++)
+		{
+			File << matrix[j][i];
+			File << " ";
+		}
+		
+		File << endl;
+	}
+	
+	File.close();
+}
+
+double rozwAnalityczne(double x, double t)
+{
+	return sin(M_PI * x) * (1 - exp(-M_PI * M_PI * D * t));
+}
+
+vector<vector<double>> MatrixAnalityczne(double h, double Dt, int m, int n)
+{
+	vector<vector<double>> matrix;
+	
+	for(int i = 0; i < n; i++)
+	{
+		matrix.push_back(vector<double>());
+		
+		for(int j = 0; j < m; j++)
+		{
+			matrix.at(i).push_back(0);
+			matrix[i][j] = rozwAnalityczne(j * h, Dt * i);
+		}
+	}
+	
+	return matrix;
+}
+
+vector<vector<double>> MatrixKlasyczna(double h, double Dt, int m, int n)
+{
+	vector<vector<double>> matrix;
+	
+	for(int i = 0; i < n; i++)
+	{
+		matrix.push_back(vector<double>());
+		
+		for(int j = 0; j < m; j++)
+		{
+			matrix.at(i).push_back(0);
+		}
+	}
+	for(int i = 0; i < n; i++)
+	{
+		matrix[i][0] = 0.0;
+	}
+	
+	for(int i = 0; i < n; i++)
+	{
+		matrix[i][m - 1] = 0.0;
+	}
+	for(int i = 0; i < m; i++)
+	{
+		matrix[0][i] = 0.0;
+	}
+	
+	double lambda = D * Dt / (h * h);
+	
+	for(int i = 1; i < n; i++)
+	{
+		for(int j = 1; j < m - 1; j++)
+		{
+			matrix.at(i).at(j) = lambda * matrix.at(i - 1).at(j - 1) + (1 - 2 * lambda) * matrix.at(i - 1).at(j) + lambda * matrix.at(i - 1).at(j + 1) + (M_PI * M_PI * sin(M_PI * j * h) * Dt);
+			cout << matrix.at(i).at(j);
+		}
+	}
+	
+	return matrix;	
+}
+
+double calculateMax(vector<double> vec)
+{
+    return *max_element(vec.begin(), vec.end());
+}
+
+bool checkError(vector<double> newX, vector<double> oldX, int m)
+{
+	double error = 10e-18;
+	
+    vector<double> errors;
+    for(int i = 0; i<m; i++){
+        errors.push_back(fabs(newX[i] - oldX[i]));
+    }
+    double maxError = calculateMax(errors);
+    if(maxError<error)
+	{
+        return true;
+    }
+    return false;
+}
+
+bool checkResiduum(vector<double> newX, int m, vector<double> B)
+{
+	double lambda = D * Dt / (h * h);
+    vector<double> fx;
+    double residuum = 10e-14;
+    
+    fx.push_back(newX.at(0) + B.at(0));
+    
+    for(int i = 1; i < m - 1; i++)
+    {
+    	fx.push_back(lambda * newX.at(i - 1) - (1 + 2 * lambda) * newX.at(i) + lambda * newX.at(i + 1) + B.at(i));
+	}
+	
+	    fx.push_back(newX.at(m - 1) + B.at(m - 1));
+
+	
+    double maxResiduum = calculateMax(fx);
+    if(maxResiduum<residuum){
+
+        return true;
+    }
+    return false;
+}
+
+vector<double> Jacobi(vector<double> l, vector<double> d, vector<double> u, vector<double> B, int m)
+{	
+
+
+  	vector<vector<double>> D;
+    vector<vector<double>> L;
+    vector<vector<double>> U;
+	for(int i = 0; i < m; i++)
+	{
+		D.push_back(vector<double>());
+		L.push_back(vector<double>());
+		U.push_back(vector<double>());
+		
+		for(int j = 0; j < m; j++)
+		{
+			if(i == j)
+				D.at(i).push_back(d.at(i));
+			else
+				D.at(i).push_back(0);	
+			if(j == i - 1)
+				L.at(i).push_back(l.at(j));
+			else
+				L.at(i).push_back(0);				
+			if(i == i + 1)
+				U.at(i).push_back(u.at(i));
+			else
+				U.at(i).push_back(0);		
+
+		}
+	}
+
+    for(int i = 0; i < m; i++)
+	{
+        D.at(i).at(i) = 1 / D.at(i).at(i);
+    }
+    vector<double> c;
+    for(int i = 0; i<m; i++){
+        c.push_back(D.at(i).at(i) * B.at(i));
+    }
+  	vector<vector<double>> M;
+    for(int i = 0; i<m; i++)
+	{	
+		M.push_back(vector<double>());
+        for(int j = 0; j<m; j++)
+		{
+            M.at(i).push_back(D.at(i).at(i) * (L.at(i).at(j) + U.at(i).at(j)));
+        }
+    }
+    vector<double> newX, oldX;
+    for(int i = 0; i < m; i++)
+    {
+    	newX.push_back(1);
+	}
+    int step = 100;
+    
+    for(int k = 0; k<step; k++)
+	{
+        oldX = newX;
+        
+        for(int i = 0; i < m; i++)
+		{
+            double mx = 0;
+            for(int j = 0; j<m; j++)
+			{
+                if(i !=j) mx += (M.at(i).at(j)*oldX.at(j));
+            }
+            newX.at(i) =-mx + c.at(i);
+        }
+        if(checkError(newX, oldX, m))
+		{
+            return newX;
+        }
+        else if(checkResiduum(newX, m, B)){
+            return newX;
+        }
+    }
+    return newX;
+}
+
+vector<vector<double>> MatrixLasson(double h, double Dt, int m, int n)
+{
+	vector<double> vectorL;
+	vector<double> vectorD;
+	vector<double> vectorU;
+	vector<double> vectorB;
+	
+	vectorL.push_back(0);
+	vectorD.push_back(1);
+	vectorU.push_back(0);
+	
+	vector<vector<double>> matrix;
+	
+	for(int i = 0; i < n; i++)
+	{
+		matrix.push_back(vector<double>());
+		
+		for(int j = 0; j < m; j++)
+		{
+			matrix.at(i).push_back(0);
+		}
+	}
+	
+	for(int i = 0; i < n; i++)
+	{
+		matrix[i][0] = 0;
+	}
+	for(int i = 0; i < n; i++)
+	{
+		matrix[i][m - 1] = 0;
+	}
+	
+	for(int i = 0; i < m; i++)
+	{
+		matrix[0][i] = 0.0;
+	}
+	double lambda = D * Dt / (h * h);
+	
+	for(int i = 1; i < m - 1; i++)
+	{
+		vectorL.push_back(lambda);
+		vectorU.push_back(lambda);
+		vectorD.push_back(- (1.0 + 2.0 * lambda));
+	}
+	
+		vectorU.push_back(0);
+		vectorD.push_back(1.0);
+		vectorL.push_back(0);
+		
+	for(int i = 1; i < n; i++)
+	{
+		vectorB.clear();
+		vectorB.push_back(0);
+		
+		for(int j = 1; j < m - 1; j++)
+		{
+			vectorB.push_back((-1) * matrix.at(i - 1).at(j) - (M_PI * M_PI * sin(M_PI * j * h) * Dt));
+		}
+		vectorB.push_back(0);
+
+		
+		matrix.at(i) = Jacobi(vectorU, vectorD, vectorL, vectorB, m);
+	}
+	
+	return matrix;
+}
+
+int main()
+{
+	int n = tmax / Dt + 1.0;
+	int m = xn / h + 1.0;
+	cout << n << endl << m << endl;
+	vector<vector<double>> matrix = MatrixLasson(h, Dt, m, n);
+	zapisDoPliku(matrix, m, n, Dt, h, "lass.csv");
+}
